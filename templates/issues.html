@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicEye AI - Infrastructure Issues</title>
+  <meta name="description" content="Searchable and filterable road and infrastructure defect audit database.">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- Global Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/" class="brand-link">
+        <div class="brand-icon">CE</div>
+        <div>
+          <span class="brand-title">CIVICEYE AI</span>
+          <span class="brand-tagline">Smart Road & Infrastructure Auditor</span>
+        </div>
+      </a>
+
+      <button class="mobile-toggle" aria-label="Toggle Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav class="main-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/issues" class="nav-link active">Issues</a>
+        <a href="/map" class="nav-link">Map</a>
+        <a href="/report" class="nav-link nav-btn-report">Report Issue</a>
+        <div id="admin-nav-slot">
+          <a href="/login" class="nav-link" id="nav-login">Admin Login</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="page-wrapper">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Civic Issues Directory</h1>
+        <p class="page-subtitle">Search, filter, inspect, and verify reported municipal hazards</p>
+      </div>
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <span id="issues-count-badge" class="badge badge-reported" style="font-size:0.85rem; padding:0.4rem 0.8rem;">
+          -- records
+        </span>
+        <span id="admin-demo-controls" style="display:none; gap:0.5rem; align-items:center;">
+          <button onclick="clearDemoData()" class="btn btn-secondary btn-sm" title="Remove pre-loaded demo records">
+            Clear Demo Data
+          </button>
+          <button onclick="resetDemoData()" class="btn btn-secondary btn-sm" title="Restore demo records">
+            Restore Demo
+          </button>
+        </span>
+        <a href="/report" class="btn btn-primary btn-sm">
+          + Report Issue
+        </a>
+      </div>
+    </div>
+
+    <!-- Role Permission Context Banner -->
+    <div id="role-context-banner" style="background:#f8fafc; border:1px solid var(--border-medium); border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1.25rem; display:flex; justify-content:space-between; align-items:center; font-size:0.85rem;">
+      <div style="display:flex; align-items:center; gap:0.6rem;">
+        <span id="role-banner-icon" style="font-size:1.2rem;">👁️</span>
+        <div>
+          <div style="font-weight:700; color:var(--text-main);" id="role-banner-title">Current Role: Viewer</div>
+          <div style="color:var(--text-secondary); font-size:0.8rem;" id="role-banner-desc">Read-only access to dashboard and issues.</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <span style="font-size:0.75rem; color:var(--text-muted);">Quick Switch:</span>
+        <button onclick="CivicEye.quickSwitchRole('admin@civiceye.gov', 'admin123')" class="btn btn-sm btn-outline" style="font-size:0.75rem; padding:0.2rem 0.5rem;" title="Switch to Administrator">👑 Admin</button>
+        <button onclick="CivicEye.quickSwitchRole('tech@civiceye.gov', 'tech123')" class="btn btn-sm btn-outline" style="font-size:0.75rem; padding:0.2rem 0.5rem;" title="Switch to Technician">🔧 Technician</button>
+        <button onclick="CivicEye.quickSwitchRole('viewer@civiceye.gov', 'viewer123')" class="btn btn-sm btn-outline" style="font-size:0.75rem; padding:0.2rem 0.5rem;" title="Switch to Viewer">👁️ Viewer</button>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div style="flex: 2; min-width: 200px;">
+        <input type="text" id="filter-search" class="filter-input" placeholder="Search by Issue ID, location, or notes...">
+      </div>
+
+      <div style="flex: 1; min-width: 140px;">
+        <select id="filter-type" class="filter-input">
+          <option value="All">All Issue Types</option>
+          <option value="Pothole">Pothole</option>
+          <option value="Road Crack">Road Crack</option>
+          <option value="Damaged Signal">Damaged Signal</option>
+          <option value="Damaged Sign">Damaged Sign</option>
+          <option value="Broken Streetlight">Broken Streetlight</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div style="flex: 1; min-width: 130px;">
+        <select id="filter-severity" class="filter-input">
+          <option value="All">All Severities</option>
+          <option value="Critical">Critical</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+
+      <div style="flex: 1; min-width: 130px;">
+        <select id="filter-status" class="filter-input">
+          <option value="All">All Statuses</option>
+          <option value="Reported">Reported</option>
+          <option value="Verified">Verified</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Resolved">Resolved</option>
+        </select>
+      </div>
+
+      <button onclick="loadIssues()" class="btn btn-secondary btn-sm" style="padding:0.6rem 1rem;">
+        Filter
+      </button>
+    </div>
+
+    <!-- Issues Table -->
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Issue ID</th>
+            <th>Issue Type</th>
+            <th>Location</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="issues-tbody">
+          <tr>
+            <td colspan="7" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">
+              Loading issues from SQLite...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Issue Detail & Admin Edit Modal -->
+  <div id="issue-modal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Infrastructure Incident</span>
+          <h2 class="modal-title"><span id="modal-issue-id">CE-000</span> &bull; <span id="modal-type">Type</span></h2>
+        </div>
+        <button class="modal-close" onclick="closeIssueModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <span id="modal-severity-badge"></span>
+            <span id="modal-status-badge"></span>
+          </div>
+          <span id="modal-ai-confidence" class="ai-pill" title="Heuristic AI defect confidence"></span>
+        </div>
+
+        <div style="margin-bottom:1.25rem;">
+          <div class="form-label">Location</div>
+          <div id="modal-location" style="font-weight:600; color:var(--text-main); margin-bottom:0.35rem;"></div>
+          <div id="modal-coords" style="font-size:0.85rem; color:var(--text-muted);"></div>
+        </div>
+
+        <div style="margin-bottom:1.25rem;">
+          <div class="form-label">Report Description</div>
+          <p id="modal-description" style="font-size:0.9rem; color:var(--text-secondary); background:var(--bg-subtle); padding:0.75rem; border-radius:var(--radius-sm); border:1px solid var(--border-light);"></p>
+        </div>
+
+        <div style="margin-bottom:1.25rem;">
+          <div class="form-label">Incident Evidence / Photo</div>
+          <div id="modal-image-box"></div>
+        </div>
+
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1.5rem;">
+          Date Logged: <span id="modal-date"></span>
+        </div>
+
+        <!-- Role-Based Status & Severity Controls -->
+        <div id="modal-admin-controls" style="display:none; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-md); padding:1rem; margin-top:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <div style="display:flex; align-items:center; gap:0.4rem; font-weight:700; color:#166534; font-size:0.875rem;">
+              <span id="modal-role-indicator-icon">👑</span>
+              <span id="modal-role-indicator-title">Administrator Management Controls</span>
+            </div>
+            <span id="modal-role-badge" class="badge badge-critical" style="font-size:0.7rem;">Administrator</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div>
+              <label class="form-label" style="font-size:0.8rem;">Change Status</label>
+              <select id="modal-status-select" class="form-control">
+                <option value="Reported">Reported</option>
+                <option value="Verified">Verified</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+              <div id="modal-status-hint" style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;"></div>
+            </div>
+            <div id="modal-severity-container">
+              <label class="form-label" style="font-size:0.8rem;">Change Severity</label>
+              <select id="modal-severity-select" class="form-control">
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <div id="modal-severity-hint" style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Viewer / Guest Notice -->
+        <div id="modal-guest-notice" style="background:#f8fafc; border:1px solid var(--border-medium); border-radius:var(--radius-md); padding:0.75rem 1rem; font-size:0.825rem; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="font-weight:600; color:var(--text-main);" id="modal-viewer-heading">👁️ Viewer (Read-Only Mode)</span>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.15rem;" id="modal-viewer-subtext">You have viewing privileges for this record. Switch to Technician or Administrator to make changes.</div>
+          </div>
+          <div style="display:flex; gap:0.35rem;">
+            <button onclick="CivicEye.quickSwitchRole('tech@civiceye.gov', 'tech123')" class="btn btn-outline btn-sm" style="font-size:0.75rem;">Login as Tech</button>
+            <button onclick="CivicEye.quickSwitchRole('admin@civiceye.gov', 'admin123')" class="btn btn-outline btn-sm" style="font-size:0.75rem;">Login as Admin</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeIssueModal()">Close</button>
+        <button id="modal-verify-btn" class="btn btn-outline" style="display:none;" onclick="quickVerifyFromModal()">Verify Issue</button>
+        <button id="modal-save-btn" class="btn btn-primary" onclick="saveAdminUpdates()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>
+        <strong>CIVICEYE AI</strong> &bull; Municipal Issue Registry
+      </div>
+      <div>
+        Direct SQLite Queries &bull; Parameterized SQL
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/issues.js"></script>
+</body>
+</html>

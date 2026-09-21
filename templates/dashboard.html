@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicEye AI - Infrastructure Dashboard</title>
+  <meta name="description" content="Real-time civic road infrastructure analytics and defect monitoring dashboard.">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/" class="brand-link">
+        <div class="brand-icon">CE</div>
+        <div>
+          <span class="brand-title">CIVICEYE AI</span>
+          <span class="brand-tagline">Smart Road & Infrastructure Auditor</span>
+        </div>
+      </a>
+
+      <button class="mobile-toggle" aria-label="Toggle Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav class="main-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/dashboard" class="nav-link active">Dashboard</a>
+        <a href="/issues" class="nav-link">Issues</a>
+        <a href="/map" class="nav-link">Map</a>
+        <a href="/report" class="nav-link nav-btn-report">Report Issue</a>
+        <div id="admin-nav-slot">
+          <a href="/login" class="nav-link" id="nav-login">Admin Login</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="page-wrapper">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Municipal Infrastructure Dashboard</h1>
+        <p class="page-subtitle">Real-time defect tracking, network health scores, and 7-day trend analysis</p>
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <button onclick="loadDashboardData()" class="btn btn-secondary btn-sm" title="Refresh SQLite metrics">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Sync Now
+        </button>
+        <a href="/report" class="btn btn-primary btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          New Report
+        </a>
+      </div>
+    </div>
+
+    <!-- Role Status & Switcher Banner -->
+    <div id="dashboard-role-banner" style="background:#f8fafc; border:1px solid var(--border-medium); border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; font-size:0.85rem;">
+      <div style="display:flex; align-items:center; gap:0.6rem;">
+        <span id="dash-role-icon" style="font-size:1.2rem;">👁️</span>
+        <div>
+          <div style="font-weight:700; color:var(--text-main);" id="dash-role-title">Active Role: Viewer (Public Observer)</div>
+          <div style="color:var(--text-secondary); font-size:0.8rem;" id="dash-role-desc">Read-only access to municipal dashboard and issues.</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <span style="font-size:0.75rem; color:var(--text-muted);">Quick Switch:</span>
+        <button onclick="CivicEye.quickSwitchRole('admin@civiceye.gov', 'admin123')" class="btn btn-sm btn-outline" style="font-size:0.75rem; padding:0.2rem 0.5rem;" title="Switch to Administrator">👑 Admin</button>
+        <button onclick="CivicEye.quickSwitchRole('tech@civiceye.gov', 'tech123')" class="btn btn-sm btn-outline" style="font-size:0.75rem; padding:0.2rem 0.5rem;" title="Switch to Technician">🔧 Technician</button>
+        <button onclick="CivicEye.quickSwitchRole('viewer@civiceye.gov', 'viewer123')" class="btn btn-sm btn-outline" style="font-size:0.75rem; padding:0.2rem 0.5rem;" title="Switch to Viewer">👁️ Viewer</button>
+      </div>
+    </div>
+
+    <!-- Live Metrics Grid (Dynamic from SQLite) -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Issues</span>
+        <span class="stat-value" id="metric-total">--</span>
+        <span class="stat-desc">All registered civic infrastructure reports</span>
+      </div>
+
+      <div class="stat-card critical">
+        <span class="stat-label">Critical Issues</span>
+        <span class="stat-value" id="metric-critical">--</span>
+        <span class="stat-desc">Urgent road hazards requiring immediate crew</span>
+      </div>
+
+      <div class="stat-card in-progress">
+        <span class="stat-label">In Progress</span>
+        <span class="stat-value" id="metric-in-progress">--</span>
+        <span class="stat-desc">Issues currently undergoing repair or review</span>
+      </div>
+
+      <div class="stat-card resolved">
+        <span class="stat-label">Resolved</span>
+        <span class="stat-value" id="metric-resolved">--</span>
+        <span class="stat-desc">Successfully verified and restored</span>
+      </div>
+    </div>
+
+    <!-- Infrastructure Health Section (Clean Progress Bar) -->
+    <section class="health-section">
+      <div class="health-header">
+        <div>
+          <h2 style="font-size:1.15rem; font-weight:800; color:var(--text-main);">Infrastructure Health Index</h2>
+          <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.2rem;">
+            Calculated as: <code>100 - % unresolved critical/high severity issues</code>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span style="font-size:1.5rem; font-weight:900; color:var(--text-main);" id="health-score">--%</span>
+          <span id="health-status-badge" class="health-status-badge healthy">Evaluating...</span>
+        </div>
+      </div>
+
+      <!-- Clean Linear Progress Bar -->
+      <div class="progress-container">
+        <div id="health-progress-fill" class="progress-bar-fill healthy" style="width: 0%;"></div>
+      </div>
+
+      <div class="health-meta">
+        <span id="health-detail-text">Syncing network integrity status...</span>
+        <span>Target benchmark: &gt;85% (Healthy threshold)</span>
+      </div>
+    </section>
+
+    <!-- 7-Day Trend Chart -->
+    <section class="card" style="margin-bottom: 2rem;">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Issue Detection Trend (Last 7 Days)</h2>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Daily incident distribution captured across municipal sectors</span>
+        </div>
+        <span class="badge badge-verified">Live Telemetry</span>
+      </div>
+      <div id="trend-chart" class="chart-container">
+        <div style="margin:auto; color:var(--text-muted); font-size:0.85rem;">Loading daily incident timeline...</div>
+      </div>
+    </section>
+
+    <!-- Recent Issues Table -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Recent Issues</h2>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Latest records registered in SQLite database</span>
+        </div>
+        <a href="/issues" class="btn btn-secondary btn-sm">View All Issues &rarr;</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Issue ID</th>
+              <th>Issue Type</th>
+              <th>Location</th>
+              <th>Severity</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recent-issues-tbody">
+            <tr>
+              <td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-muted);">
+                Connecting to SQLite database...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>
+        <strong>CIVICEYE AI</strong> &bull; Municipal Dashboard Engine
+      </div>
+      <div>
+        Connected to SQLite &bull; REST API active
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

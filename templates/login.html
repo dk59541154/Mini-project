@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicEye AI - Auditor & Admin Login</title>
+  <meta name="description" content="Secure administrative access for infrastructure verification and dispatch.">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- Global Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/" class="brand-link">
+        <div class="brand-icon">CE</div>
+        <div>
+          <span class="brand-title">CIVICEYE AI</span>
+          <span class="brand-tagline">Smart Road & Infrastructure Auditor</span>
+        </div>
+      </a>
+
+      <button class="mobile-toggle" aria-label="Toggle Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav class="main-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/issues" class="nav-link">Issues</a>
+        <a href="/map" class="nav-link">Map</a>
+        <a href="/report" class="nav-link nav-btn-report">Report Issue</a>
+        <div id="admin-nav-slot">
+          <a href="/login" class="nav-link active" id="nav-login">Admin Login</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Login Main -->
+  <main class="page-wrapper">
+    <div style="max-width: 520px; margin: 2rem auto;">
+      <div class="card" style="padding: 2.25rem;">
+        <div style="text-align:center; margin-bottom: 1.75rem;">
+          <div style="width:48px; height:48px; background:var(--primary-light); color:var(--primary); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; margin: 0 auto 0.75rem auto;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h1 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);">CivicEye AI Authentication</h1>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
+            Role-Based Access Control: Select a persona or enter authorized credentials
+          </p>
+        </div>
+
+        <!-- 1-Click Role Persona Cards -->
+        <div style="margin-bottom:1.5rem;">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem; letter-spacing:0.04em;">
+            Instant Role Switcher
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.5rem;">
+            <!-- Administrator Card -->
+            <button type="button" onclick="selectRole('admin@civiceye.gov', 'admin123')" class="role-select-card" style="display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border:1px solid #bfdbfe; background:#f0f9ff; border-radius:var(--radius-md); text-align:left; cursor:pointer; width:100%;">
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <span style="font-size:1.25rem;">👑</span>
+                <div>
+                  <div style="font-weight:700; font-size:0.85rem; color:#1e3a8a;">Administrator (Chief Auditor)</div>
+                  <div style="font-size:0.75rem; color:#3b82f6;">Full access: verification, severity reclassification, dispatch</div>
+                </div>
+              </div>
+              <span class="badge badge-critical" style="font-size:0.7rem;">Full Access</span>
+            </button>
+
+            <!-- Technician Card -->
+            <button type="button" onclick="selectRole('tech@civiceye.gov', 'tech123')" class="role-select-card" style="display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border:1px solid #bbf7d0; background:#f0fdf4; border-radius:var(--radius-md); text-align:left; cursor:pointer; width:100%;">
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <span style="font-size:1.25rem;">🔧</span>
+                <div>
+                  <div style="font-weight:700; font-size:0.85rem; color:#14532d;">Technician (Field Repair)</div>
+                  <div style="font-size:0.75rem; color:#16a34a;">Status updates allowed: 'In Progress' & 'Resolved'</div>
+                </div>
+              </div>
+              <span class="badge badge-verified" style="font-size:0.7rem;">Field Tech</span>
+            </button>
+
+            <!-- Viewer Card -->
+            <button type="button" onclick="selectRole('viewer@civiceye.gov', 'viewer123')" class="role-select-card" style="display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border:1px solid var(--border-medium); background:#f8fafc; border-radius:var(--radius-md); text-align:left; cursor:pointer; width:100%;">
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <span style="font-size:1.25rem;">👁️</span>
+                <div>
+                  <div style="font-weight:700; font-size:0.85rem; color:var(--text-main);">Viewer (Public Observer)</div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">Read-only access to dashboard and issue reports</div>
+                </div>
+              </div>
+              <span class="badge badge-low" style="font-size:0.7rem;">Read-Only</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="position:relative; text-align:center; margin:1.25rem 0;">
+          <hr style="border:0; border-top:1px solid var(--border-light);">
+          <span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:white; padding:0 0.5rem; font-size:0.75rem; color:var(--text-muted); font-weight:600;">OR ENTER CREDENTIALS</span>
+        </div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-email" class="form-label">Email Address</label>
+            <input type="email" id="login-email" class="form-control" value="admin@civiceye.gov" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label for="login-password" class="form-label">Password</label>
+            <input type="password" id="login-password" class="form-control" value="admin123" required autocomplete="current-password">
+          </div>
+
+          <button type="submit" id="btn-login-submit" class="btn btn-primary" style="width:100%; padding:0.75rem;">
+            Authenticate & Open Console
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>
+        <strong>CIVICEYE AI</strong> &bull; Municipal Security & RBAC System
+      </div>
+      <div>
+        SHA-256 SQLite Verified &bull; Roles: Viewer, Technician, Administrator
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    function selectRole(email, password) {
+      document.getElementById("login-email").value = email;
+      document.getElementById("login-password").value = password;
+      document.getElementById("btn-login-submit").click();
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value.trim();
+      const btn = document.getElementById("btn-login-submit");
+
+      try {
+        btn.disabled = true;
+        btn.textContent = "Verifying role permissions...";
+
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success && data.user) {
+          localStorage.setItem("civiceye_user", JSON.stringify(data.user));
+          CivicEye.currentUser = data.user;
+          CivicEye.showToast(`Authenticated as ${data.user.role}! Redirecting...`);
+          setTimeout(() => {
+            window.location.href = "/issues";
+          }, 500);
+        } else {
+          CivicEye.showToast(data.error || "Invalid credentials", "error");
+        }
+      } catch (err) {
+        CivicEye.showToast("Network error during login", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Authenticate & Open Console";
+      }
+    });
+  </script>
+</body>
+</html>

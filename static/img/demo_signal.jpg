@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <rect width="600" height="400" fill="#1e293b"/>
+  <!-- Mast arm -->
+  <line x1="50" y1="80" x2="550" y2="80" stroke="#94a3b8" stroke-width="14"/>
+  <!-- Dangling traffic light housing tilted -->
+  <g transform="translate(300, 110) rotate(26)">
+    <rect x="-35" y="0" width="70" height="170" rx="8" fill="#0f172a" stroke="#475569" stroke-width="3"/>
+    <circle cx="0" cy="35" r="18" fill="#dc2626"/>
+    <circle cx="0" cy="85" r="18" fill="#f59e0b" opacity="0.3"/>
+    <circle cx="0" cy="135" r="18" fill="#10b981" opacity="0.3"/>
+  </g>
+  <text x="300" y="45" fill="#f8fafc" font-family="sans-serif" font-size="22" font-weight="bold" text-anchor="middle">DAMAGED TRAFFIC SIGNAL</text>
+  <rect x="230" y="90" width="160" height="200" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,4"/>
+  <rect x="230" y="70" width="160" height="22" fill="#dc2626" rx="2"/>
+  <text x="238" y="86" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold">DAMAGED SIGNAL 96%</text>
+</svg>

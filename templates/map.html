@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicEye AI - Infrastructure Geospatial Map</title>
+  <meta name="description" content="Geospatial distribution and GPS plotting of municipal infrastructure defects.">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Leaflet GIS Map Library -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+</head>
+<body>
+  <!-- Global Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/" class="brand-link">
+        <div class="brand-icon">CE</div>
+        <div>
+          <span class="brand-title">CIVICEYE AI</span>
+          <span class="brand-tagline">Smart Road & Infrastructure Auditor</span>
+        </div>
+      </a>
+
+      <button class="mobile-toggle" aria-label="Toggle Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav class="main-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/issues" class="nav-link">Issues</a>
+        <a href="/map" class="nav-link active">Map</a>
+        <a href="/report" class="nav-link nav-btn-report">Report Issue</a>
+        <div id="admin-nav-slot">
+          <a href="/login" class="nav-link" id="nav-login">Admin Login</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="page-wrapper" style="padding-bottom: 1.5rem;">
+    <div class="page-header" style="margin-bottom: 1.25rem;">
+      <div>
+        <h1 class="page-title">Geospatial Infrastructure Map</h1>
+        <p class="page-subtitle">Real-time GPS pinpoints plotted from SQLite records</p>
+      </div>
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <span id="gps-count-badge" class="badge badge-low" style="padding:0.4rem 0.75rem;">-- Plotted</span>
+        <span id="nogps-count-badge" class="badge badge-reported" style="padding:0.4rem 0.75rem;">-- Unplotted</span>
+        <button onclick="initCivicMap()" class="btn btn-secondary btn-sm">Refresh Pins</button>
+      </div>
+    </div>
+
+    <!-- Map & Sidebar Split Layout -->
+    <div class="map-layout">
+      <!-- Sidebar List -->
+      <aside class="map-sidebar">
+        <div class="map-sidebar-header">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Incidents by Location</span>
+            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">Click to locate</span>
+          </div>
+        </div>
+        <ul id="map-sidebar-list" class="map-issue-list">
+          <li style="padding:1rem; color:var(--text-muted); text-align:center;">Loading GPS coordinates...</li>
+        </ul>
+      </aside>
+
+      <!-- Map Viewport -->
+      <div class="map-canvas-container">
+        <div id="civic-map"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>
+        <strong>CIVICEYE AI</strong> &bull; GIS Infrastructure Mapping
+      </div>
+      <div>
+        OpenStreetMap &bull; Real SQLite Coordinates
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/map.js"></script>
+</body>
+</html>

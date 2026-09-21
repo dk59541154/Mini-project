@@ -1,0 +1,6 @@
+{
+  "name": "CivicEye AI",
+  "description": "Smart road and infrastructure auditor that detects, locates, verifies, prioritizes, and tracks civic issues.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

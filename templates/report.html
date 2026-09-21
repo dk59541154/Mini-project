@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicEye AI - Report Infrastructure Issue</title>
+  <meta name="description" content="Report road damage, potholes, cracks, or broken signals for municipal audit.">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- Global Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/" class="brand-link">
+        <div class="brand-icon">CE</div>
+        <div>
+          <span class="brand-title">CIVICEYE AI</span>
+          <span class="brand-tagline">Smart Road & Infrastructure Auditor</span>
+        </div>
+      </a>
+
+      <button class="mobile-toggle" aria-label="Toggle Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav class="main-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/issues" class="nav-link">Issues</a>
+        <a href="/map" class="nav-link">Map</a>
+        <a href="/report" class="nav-link nav-btn-report active">Report Issue</a>
+        <div id="admin-nav-slot">
+          <a href="/login" class="nav-link" id="nav-login">Admin Login</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="page-wrapper">
+    <div style="max-width: 760px; margin: 0 auto;">
+      <div class="page-header" style="margin-bottom: 1.5rem;">
+        <div>
+          <h1 class="page-title">Report Civic Infrastructure Defect</h1>
+          <p class="page-subtitle">Submit hazard details, GPS location, and photos for AI-assisted validation</p>
+        </div>
+      </div>
+
+      <!-- Success Confirmation Card (Hidden by default) -->
+      <div id="report-success-card" class="card" style="display:none; text-align:center; padding: 3rem 2rem; border-color:#86efac; background:#f0fdf4; margin-bottom: 2rem;">
+        <div style="width:56px; height:56px; background:#22c55e; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 1.25rem auto;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h2 style="font-size: 1.6rem; font-weight:800; color:#14532d; margin-bottom:0.5rem;">Issue Report Received</h2>
+        <p style="color:#166534; font-size:1.05rem; margin-bottom:1.5rem;">
+          Your infrastructure incident has been recorded and assigned tracking identifier:
+        </p>
+
+        <div style="display:inline-block; background:white; padding:0.75rem 2rem; border-radius:var(--radius-md); border:2px solid #22c55e; margin-bottom:1.5rem;">
+          <span style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; display:block;">Incident ID</span>
+          <span id="success-issue-id" style="font-size:2.25rem; font-weight:900; color:#15803d; font-family:var(--font-mono);">CE-000</span>
+        </div>
+
+        <div style="background:white; border:1px solid #dcfce7; border-radius:var(--radius-md); padding:1rem; max-width:480px; margin: 0 auto 2rem auto; text-align:left; font-size:0.9rem;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
+            <span style="color:var(--text-muted);">Defect Classification:</span>
+            <strong id="success-type">--</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
+            <span style="color:var(--text-muted);">Assigned Severity:</span>
+            <span id="success-severity"></span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-muted);">Location:</span>
+            <span id="success-location" style="font-weight:600; text-align:right; max-width:250px;">--</span>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+          <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+          <a href="/issues" class="btn btn-secondary">View Issues Directory</a>
+          <button onclick="resetReportForm()" class="btn btn-outline">Submit Another Report</button>
+        </div>
+      </div>
+
+      <!-- Main Form Card -->
+      <div id="report-form-card" class="card">
+        <form id="report-form" novalidate>
+          <!-- Issue Type -->
+          <div class="form-group">
+            <label for="select-issue-type" class="form-label">
+              Defect Category <span style="color:#dc2626;">*</span>
+            </label>
+            <select id="select-issue-type" class="form-control" required>
+              <option value="">Select defect category...</option>
+              <option value="Pothole">Pothole</option>
+              <option value="Road Crack">Road Crack</option>
+              <option value="Damaged Signal">Damaged Signal</option>
+              <option value="Damaged Sign">Damaged Sign</option>
+              <option value="Broken Streetlight">Broken Streetlight</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Location & Coordinates -->
+          <div class="form-group">
+            <label for="input-location" class="form-label">
+              Physical Location / Street Address <span style="color:#dc2626;">*</span>
+            </label>
+            <input type="text" id="input-location" class="form-control" placeholder="e.g. 452 Elm Street near 5th Avenue intersection" required>
+            <div class="form-hint">Provide cross streets, mile markers, or landmark descriptions.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Geographic Coordinates (GPS)</label>
+            <div class="coordinates-row">
+              <div>
+                <input type="number" step="any" id="input-latitude" class="form-control" placeholder="Latitude (e.g. 37.7749)">
+              </div>
+              <div>
+                <input type="number" step="any" id="input-longitude" class="form-control" placeholder="Longitude (e.g. -122.4194)">
+              </div>
+              <div>
+                <button type="button" id="btn-geolocation" class="btn btn-secondary" style="height:42px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  Use My Location
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Severity Selection -->
+          <div class="form-group">
+            <label for="select-severity" class="form-label">Urgency / Severity Level</label>
+            <select id="select-severity" class="form-control">
+              <option value="Critical">Critical - Immediate collision/injury risk</option>
+              <option value="High">High - Impeding traffic flow or vehicle damage</option>
+              <option value="Medium" selected>Medium - Noticeable wear or malfunction</option>
+              <option value="Low">Low - Cosmetic or minor preventative defect</option>
+            </select>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="input-description" class="form-label">Defect Description</label>
+            <textarea id="input-description" class="form-control" rows="3" placeholder="Detail the condition, approximate diameter/depth, traffic obstruction, or any safety concerns..."></textarea>
+          </div>
+
+          <!-- Image Upload & AI Vision Preview -->
+          <div class="form-group">
+            <label class="form-label">Defect Photo Evidence</label>
+            
+            <input type="file" id="file-input" accept="image/*" style="display:none;">
+            
+            <div id="upload-dropzone" class="dropzone">
+              <div class="dropzone-icon">📷</div>
+              <div class="dropzone-text">Click to upload or drag & drop photo</div>
+              <div class="dropzone-subtext">Supports JPG, PNG, WebP up to 16MB. Image will be processed by AI detector.</div>
+            </div>
+
+            <!-- Preview box -->
+            <div id="preview-wrapper" style="display:none; margin-top:1rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-size:0.85rem; font-weight:700;">Selected Image</span>
+                <button type="button" id="btn-remove-image" class="btn btn-sm btn-secondary" style="color:#b91c1c;">Remove</button>
+              </div>
+              <div class="image-preview-container">
+                <img id="image-preview" src="" alt="Defect Upload Preview">
+              </div>
+            </div>
+
+            <!-- AI Detection Feedback Box -->
+            <div id="ai-feedback-box" class="ai-feedback-box" style="display:none;">
+              <div class="ai-feedback-header">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span class="ai-pill">AI Vision Analysis</span>
+                  <span style="font-weight:700; font-size:0.9rem;" id="ai-predicted-type">Pothole</span>
+                </div>
+                <span id="ai-predicted-conf" style="font-size:0.8rem; font-weight:700; color:var(--primary);">92% Confidence</span>
+              </div>
+              <div style="font-size:0.825rem; color:var(--text-secondary); margin-bottom:0.35rem;">
+                Estimated Priority: <strong id="ai-predicted-sev">High</strong>
+              </div>
+              <div id="ai-predicted-rec" style="font-size:0.8rem; color:var(--text-muted); font-style:italic;">
+                Recommended action queued for municipal review.
+              </div>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--border-light); padding-top: 1.5rem; margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+            <button type="submit" id="btn-submit-report" class="btn btn-primary" style="padding:0.75rem 1.75rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              Submit Issue Report
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>
+        <strong>CIVICEYE AI</strong> &bull; Incident Reporting Portal
+      </div>
+      <div>
+        Geolocation & AI Vision Pipeline &bull; Saved to SQLite
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/report.js"></script>
+</body>
+</html>
